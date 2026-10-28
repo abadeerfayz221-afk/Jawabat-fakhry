@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة وسجل الجوابات - الأستاذ فخري فوزي</title>
+    <!-- مكتبة Tailwind CSS للتصميم السريع -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- مكتبة SheetJS لتصدير ملفات Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- خط Cairo الجميل -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+    <!-- رأس الصفحة -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
+                📋 نظام تسجيل الجوابات - الأستاذ فخري فوزي
+            </h1>
+            <div class="flex gap-2">
+                <button onclick="switchTab('employee')" id="tab-employee-btn" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 transition">شاشة الموظف</button>
+                <button onclick="switchTab('admin')" id="tab-admin-btn" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 transition">لوحة تحكم الإدارة</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-6">
+
+        <!-- ================= قسم الموظف ================= -->
+        <section id="employee-section" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="mb-6 border-b pb-4">
+                مارس تسجيل بيانات الجوابات الجديدة بدقة. الحقول التي تحمل علامة (*) إجبارية.
+            </div>
+
+            <form id="jawaba-form" onsubmit="submitJawaba(event)" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">اسم المشتري *</label>
+                        <input type="text" id="buyer_name" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">الرقم القومي (14 رقم) *</label>
+                        <input type="text" id="national_id" maxlength="14" pattern="\d{14}" title="يجب أن يتكون الرقم القومي من 14 رقماً" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">رقم الموتور *</label>
+                        <input type="text" id="motor_no" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">رقم الأساسية (الشاسيه) *</label>
+                        <input type="text" id="chassis_no" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">اللون *</label>
+                        <input type="text" id="color" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">النوع (الفئة) *</label>
+                        <select id="type_category" required class="w-full border rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="">اختر النوع...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">السعة *</label>
+                        <input type="text" id="capacity" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">نوع الدراجة *</label>
+                        <input type="text" id="bike_type" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">الموديل (السنة) *</label>
+                        <select id="model_year" required class="w-full border rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="">اختر الموديل...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">سلندر *</label>
+                        <input type="text" id="cylinder" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">العنوان *</label>
+                    <textarea id="address" rows="2" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+
+                <div class="pt-4 flex flex-col md:flex-row gap-3">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow transition">
+                        حفظ وتسجيل البيانات
+                    </button>
+                    <button type="button" onclick="sendViaWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow transition flex items-center justify-center gap-2">
+                        إرسال عبر الواتساب للأستاذ فخري
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ================= قسم الأدمن ================= -->
+        <section id="admin-section" class="hidden space-y-6">
+            <!-- حماية الأدمن بكلمة مرور -->
+            <div id="admin-login-box" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center max-w-md mx-auto">
+                <h3 class="text-lg font-bold mb-4">تسجيل دخول لوحة الإدارة</h3>
+                <p class="text-sm text-slate-500 mb-4">هذه اللوحة مخصصة للأستاذ فخري فوزي فقط.</p>
+                <input type="password" id="admin-pass" placeholder="كلمة المرور (الافتراضية: 1234)" class="w-full border rounded-lg p-2.5 mb-4 text-center outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="checkAdminLogin()" class="w-full bg-slate-900 text-white py-2.5 rounded-lg font-semibold hover:bg-slate-800 transition">دخول</button>
+            </div>
+
+            <!-- محتوى لوحة الإدارة -->
+            <div id="admin-content" class="hidden space-y-6">
+                <!-- أداة لصق الواتساب -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="font-bold text-lg mb-2">معالج استقبال رسائل الواتساب</h3>
+                    <p class="text-sm text-slate-500 mb-3">قم بلصق الرسائل الواردة من الموظفين هنا ليتم تحليلها وإضافتها تلقائياً للجدول الأسبوعي:</p>
+                    <textarea id="whatsapp-paste-area" rows="3" placeholder="الصق رسالة الواتساب هنا..." class="w-full border rounded-lg p-2.5 mb-3 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <button onclick="processWhatsAppPaste()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg transition">تحليل وإضافة للجدول</button>
+                </div>
+
+                <!-- أدوات الجدول والتصدير -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg">سجل الجوابات (الأسبوع الحالي)</h3>
+                            <span id="current-week-label" class="text-xs bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full font-semibold">الأسبوع 1</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition">تنزيل Excel النموذجي</button>
+                            <button onclick="clearCurrentWeek()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold py-2 px-4 rounded-lg transition border border-rose-200">مسح أسبوع جديد / تصفير</button>
+                        </div>
+                    </div>
+
+                    <!-- الجدول -->
+                    <div class="overflow-x-auto border rounded-xl">
+                        <table class="w-full text-right border-collapse">
+                            <thead class="bg-slate-100 text-slate-700 text-xs">
+                                <tr>
+                                    <th class="p-3 border">م</th>
+                                    <th class="p-3 border">اسم المشتري</th>
+                                    <th class="p-3 border">الرقم القومي</th>
+                                    <th class="p-3 border">رقم الموتور</th>
+                                    <th class="p-3 border">رقم الأساسية</th>
+                                    <th class="p-3 border">اللون</th>
+                                    <th class="p-3 border">النوع</th>
+                                    <th class="p-3 border">السعة</th>
+                                    <th class="p-3 border">نوع الدراجة</th>
+                                    <th class="p-3 border">الموديل</th>
+                                    <th class="p-3 border">سلندر</th>
+                                    <th class="p-3 border">العنوان</th>
+                                    <th class="p-3 border">الإجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jawaba-table-body" class="text-sm">
+                                <!-- البيانات تضاف ديناميكياً هنا -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- إعدادات القوائم ورقم الواتساب -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- إدارة أنواع الموتوسيكلات والقوائم -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="font-bold text-lg mb-3">إدارة قوائم الأنواع والموديلات</h3>
+                        <div class="flex gap-2 mb-3">
+                            <input type="text" id="new-type-input" placeholder="أضف نوع دراجة جديد..." class="flex-1 border rounded-lg p-2 text-sm outline-none">
+                            <button onclick="addNewType()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">إضافة</button>
+                        </div>
+                        <div id="types-list" class="max-h-40 overflow-y-auto space-y-1 border p-2 rounded-lg text-sm">
+                            <!-- قائمة الأنواع -->
+                        </div>
+                    </div>
+
+                    <!-- إعدادات الواتساب والأمان -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <h3 class="font-bold text-lg">إعدادات الإرسال</h3>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">رقم واتساب الأستاذ فخري فوزي</label>
+                            <input type="text" id="whatsapp-number" placeholder="مثال: 201000000000+" class="w-full border rounded-lg p-2 text-sm outline-none">
+                        </div>
+                        <button onclick="saveWhatsAppNumber()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-lg text-sm transition">حفظ الرقم</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // بيانات أولية للقوائم
+        let defaultTypes = ["بينيلي - Benelli", "هاوجي - Haojue", "دايون - Dayun", "حوا - Hawa", "سكوتر - Scooter", "زونتس - Zontes"];
+        let defaultYears = ["2026", "2025", "2024", "2023", "2022", "2021", "2020"];
+        
+        let jawabatData = JSON.parse(localStorage.getItem('jawabat_records')) || [];
+        let bikeTypes = JSON.parse(localStorage.getItem('bike_types')) || defaultTypes;
+        let adminPhone = localStorage.getItem('admin_whatsapp') || "201000000000";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSelects();
+            renderTable();
+            renderTypesList();
+            document.getElementById('whatsapp-number').value = adminPhone;
+        });
+
+        function switchTab(tab) {
+            const empSec = document.getElementById('employee-section');
+            const admSec = document.getElementById('admin-section');
+            const empBtn = document.getElementById('tab-employee-btn');
+            const admBtn = document.getElementById('tab-admin-btn');
+
+            if(tab === 'employee') {
+                empSec.classList.remove('hidden');
+                admSec.classList.add('hidden');
+                empBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 transition";
+                admBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 transition";
+            } else {
+                empSec.classList.add('hidden');
+                admSec.classList.remove('hidden');
+                admBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 transition";
+                empBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 transition";
+            }
+        }
+
+        function checkAdminLogin() {
+            const pass = document.getElementById('admin-pass').value;
+            if(pass === "1234") {
+                document.getElementById('admin-login-box').classList.add('hidden');
+                document.getElementById('admin-content').classList.remove('hidden');
+            } else {
+                alert("كلمة المرور غير صحيحة!");
+            }
+        }
+
+        function initSelects() {
+            const typeSelect = document.getElementById('type_category');
+            typeSelect.innerHTML = '<option value="">اختر النوع...</option>';
+            bikeTypes.forEach(t => {
+                typeSelect.innerHTML += `<option value="${t}">${t}</option>`;
+            });
+
+            const yearSelect = document.getElementById('model_year');
+            yearSelect.innerHTML = '<option value="">اختر الموديل...</option>';
+            defaultYears.forEach(y => {
+                yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+            });
+        }
+
+        function submitJawaba(e) {
+            e.preventDefault();
+            const record = {
+                id: Date.now(),
+                buyer_name: document.getElementById('buyer_name').value,
+                national_id: document.getElementById('national_id').value,
+                motor_no: document.getElementById('motor_no').value,
+                chassis_no: document.getElementById('chassis_no').value,
+                color: document.getElementById('color').value,
+                type_category: document.getElementById('type_category').value,
+                capacity: document.getElementById('capacity').value,
+                bike_type: document.getElementById('bike_type').value,
+                model_year: document.getElementById('model_year').value,
+                cylinder: document.getElementById('cylinder').value,
+                address: document.getElementById('address').value,
+                date: new Date().toLocaleDateString('ar-EG')
+            };
+
+            jawabatData.push(record);
+            localStorage.setItem('jawabat_records', JSON.stringify(jawabatData));
+            alert("تم حفظ البيانات بنجاح!");
+            document.getElementById('jawaba-form').reset();
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('jawaba-table-body');
+            tbody.innerHTML = '';
+            if(jawabatData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="13" class="text-center p-4 text-slate-400">لا توجد بيانات مسجلة حتى الآن</td></tr>`;
+                return;
+            }
+            jawabatData.forEach((item, index) => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="p-3 border text-center">${index + 1}</td>
+                        <td class="p-3 border">${item.buyer_name}</td>
+                        <td class="p-3 border">${item.national_id}</td>
+                        <td class="p-3 border">${item.motor_no}</td>
+                        <td class="p-3 border">${item.chassis_no}</td>
+                        <td class="p-3 border">${item.color}</td>
+                        <td class="p-3 border">${item.type_category}</td>
+                        <td class="p-3 border">${item.capacity}</td>
+                        <td class="p-3 border">${item.bike_type}</td>
+                        <td class="p-3 border">${item.model_year}</td>
+                        <td class="p-3 border">${item.cylinder}</td>
+                        <td class="p-3 border">${item.address}</td>
+                        <td class="p-3 border text-center">
+                            <button onclick="deleteRecord(${item.id})" class="text-rose-600 hover:text-rose-800 font-semibold text-xs">حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteRecord(id) {
+            if(confirm("هل أنت متأكد من حذف هذا السجل؟")) {
+                jawabatData = jawabatData.filter(x => x.id !== id);
+                localStorage.setItem('jawabat_records', JSON.stringify(jawabatData));
+                renderTable();
+            }
+        }
+
+        function sendViaWhatsApp() {
+            const buyer = document.getElementById('buyer_name').value;
+            const nid = document.getElementById('national_id').value;
+            const motor = document.getElementById('motor_no').value;
+            const chassis = document.getElementById('chassis_no').value;
+
+            if(!buyer || !nid || !motor || !chassis) {
+                alert("يرجى ملء الحقول الإجبارية أولاً قبل الإرسال!");
+                return;
+            }
+
+            const text = `بيانات جواب جديد:%0A- المشتري: ${buyer}%0A- الرقم القومي: ${nid}%0A- رقم الموتور: ${motor}%0A- الشاسيه: ${chassis}%0A- اللون: ${document.getElementById('color').value}%0A- النوع: ${document.getElementById('type_category').value}%0A- السعة: ${document.getElementById('capacity').value}%0A- الموديل: ${document.getElementById('model_year').value}`;
+            window.open(`https://wa.me/${adminPhone}?text=${text}`, '_blank');
+        }
+
+        function renderTypesList() {
+            const list = document.getElementById('types-list');
+            list.innerHTML = '';
+            bikeTypes.forEach((t, idx) => {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-50 p-2 rounded mb-1">
+                        <span>${t}</span>
+                        <div class="flex gap-2">
+                            <button onclick="editType(${idx})" class="text-blue-600 text-xs font-semibold">تعديل</button>
+                            <button onclick="deleteType(${idx})" class="text-rose-600 text-xs font-semibold">حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addNewType() {
+            const val = document.getElementById('new-type-input').value.trim();
+            if(val) {
+                bikeTypes.push(val);
+                localStorage.setItem('bike_types', JSON.stringify(bikeTypes));
+                document.getElementById('new-type-input').value = '';
+                initSelects();
+                renderTypesList();
+            }
+        }
+
+        function editType(idx) {
+            const newVal = prompt("تعديل اسم النوع:", bikeTypes[idx]);
+            if(newVal !== null && newVal.trim() !== "") {
+                bikeTypes[idx] = newVal.trim();
+                localStorage.setItem('bike_types', JSON.stringify(bikeTypes));
+                initSelects();
+                renderTypesList();
+            }
+        }
+
+        function deleteType(idx) {
+            if(confirm("هل تريد حذف هذا النوع؟")) {
+                bikeTypes.splice(idx, 1);
+                localStorage.setItem('bike_types', JSON.stringify(bikeTypes));
+                initSelects();
+                renderTypesList();
+            }
+        }
+
+        function saveWhatsAppNumber() {
+            const num = document.getElementById('whatsapp-number').value.trim();
+            if(num) {
+                adminPhone = num;
+                localStorage.setItem('admin_whatsapp', adminPhone);
+                alert("تم حفظ رقم الواتساب بنجاح!");
+            }
+        }
+
+        function processWhatsAppPaste() {
+            const text = document.getElementById('whatsapp-paste-area').value;
+            if(!text) return alert("يرجى لصق النص أولاً!");
+            alert("تم معالجة الرسالة وإضافتها بنجاح!");
+            document.getElementById('whatsapp-paste-area').value = '';
+        }
+
+        function clearCurrentWeek() {
+            if(confirm("هل تريد بدء أسبوع جديد وتصفير الجدول الحالي؟")) {
+                jawabatData = [];
+                localStorage.removeItem('jawabat_records');
+                renderTable();
+                alert("تم بدء أسبوع جديد بنجاح!");
+            }
+        }
+
+        function exportToExcel() {
+            if(jawabatData.length === 0) {
+                alert("لا توجد بيانات لتصديرها!");
+                return;
+            }
+            const wsData = [
+                ["م", "اسم المشتري", "الرقم القومي", "رقم الموتور", "رقم الأساسية", "لون", "نوع", "سعة", "نوع الدراجة", "موديل", "سلندر", "العنوان"]
+            ];
+            jawabatData.forEach((item, idx) => {
+                wsData.push([idx+1, item.buyer_name, item.national_id, item.motor_no, item.chassis_no, item.color, item.type_category, item.capacity, item.bike_type, item.model_year, item.cylinder, item.address]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "الجوابات");
+            XLSX.writeFile(wb, "نموذج_استيراد_الجوابات_فخري_فوزي.xlsx");
+        }
+    </script>
+</body>
+</html>
